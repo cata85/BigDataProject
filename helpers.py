@@ -21,15 +21,7 @@ def database_exists(client, DB_NAME):
     return False
 
 
-# Reads a given file and yields the lines one by one to conserve memory.
-# Param 'yield_size' is the size of an array you want to give back when yielded.
-# 'yield_size' of 0 will result in one large array. Be careful when using to avoid memory error.
-#def read_file(FILE, yield_size=0):
-#    with open(FILE, 'r') as _file:
-#	if yield_size:
-#            return islice(_file, yield_size)
-#        return [line for line in _file]
-
+# Reads given file and returns an RDD for that file.
 def read_file(FILE, sc):
     rdd = sc.textFile(FILE)
     return rdd

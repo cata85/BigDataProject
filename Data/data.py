@@ -16,15 +16,15 @@ def get_collection(db, COLLECTION_NAME):
 
 
 # Creates a collection for the database.
-def create_collection(DB_NAME, COLLECTION, rdd):
+def create_collection(DB_NAME, COLLECTION, WANTED_DATA, rdd):
     def insert(iterator):
-        print('inside')
         client = MongoClient()
         db = client[DB_NAME]
         collection = db[COLLECTION]
         for data in iterator:
-            json_data = json.loads(data)
-            collection.insert_one(json_data)
+            dirty_json = json.loads(data)
+            wanted_data = {key: dirty_json[key] for key in WANTED_DATA}
+            collection.insert_one(wanted_data)
 
     rdd.foreachPartition(insert)
     print('done')
