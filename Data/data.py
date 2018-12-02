@@ -36,16 +36,20 @@ def update_collection(DB_NAME, COLLECTION, comments_rdd):
 
 
 # Creates a collection for subreddits.
-def create_collection(DB_NAME, COLLECTION, subreddits_rdd):
+def create_collection(DB_NAME, COLLECTION, rdd):
     def insert(iterator):
         client = MongoClient()
         db = client[DB_NAME]
         collection = db[COLLECTION]
-        for _subreddit in iterator:
-            row = {'subreddit': _subreddit, 'authors': []}
+        for data in iterator:
+            subreddit = data[0]
+            authors = data[1]
+            total = len(authors)
+            print(total)
+            row = {'subreddit': subreddit, 'total': total, 'authors': authors}
             collection.insert_one(row)
 
-    subreddits_rdd.foreachPartition(insert)
+    rdd.foreachPartition(insert)
     print('Created subreddits collection!')
     pass
 
