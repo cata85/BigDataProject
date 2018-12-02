@@ -15,7 +15,6 @@ def initialize():
 # Checks if a database exists.
 def database_exists(client, DB_NAME):
     db_names = client.list_database_names()
-    print(db_names)
     if DB_NAME in db_names:
         return True
     return False

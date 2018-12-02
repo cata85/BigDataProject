@@ -10,23 +10,42 @@ def get_or_create_database(client, DB_NAME):
 
 
 # Returns a specified collection.
-def get_collection(db, COLLECTION_NAME):
-    collection = db[COLLECTION_NAME]
+def get_collection(db, COLLECTION):
+    collection = db[COLLECTION]
     return collection
 
 
-# Creates a collection for the database.
-def create_collection(DB_NAME, COLLECTION, WANTED_DATA, rdd):
+# Updates the subreddits collection.
+def update_collection(DB_NAME, COLLECTION, comments_rdd):
     def insert(iterator):
         client = MongoClient()
         db = client[DB_NAME]
         collection = db[COLLECTION]
         for data in iterator:
             dirty_json = json.loads(data)
-            wanted_data = {key: dirty_json[key] for key in WANTED_DATA}
-            collection.insert_one(wanted_data)
+            author = dirty_json['author']
+            subreddit = dirty_json['subreddit']
+            collection.update(
+                    {'subreddit': subreddit},
+                    {'$addToSet': {'authors': author} },
+                    upsert=True)
 
-    rdd.foreachPartition(insert)
-    print('done')
+    comments_rdd.foreachPartition(insert)
+    print('Updated subreddits collection')
+    pass
+
+
+# Creates a collection for subreddits.
+def create_collection(DB_NAME, COLLECTION, subreddits_rdd):
+    def insert(iterator):
+        client = MongoClient()
+        db = client[DB_NAME]
+        collection = db[COLLECTION]
+        for _subreddit in iterator:
+            row = {'subreddit': _subreddit, 'authors': []}
+            collection.insert_one(row)
+
+    subreddits_rdd.foreachPartition(insert)
+    print('Created subreddits collection!')
     pass
 
