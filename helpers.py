@@ -37,11 +37,16 @@ def get_subreddits(FILE):
 
 
 # Gathers necessary info from the comment data.
+#def get_data(comment_data):
+#    jdata = json.loads(comment_data)
+#    subreddit = jdata['subreddit']
+#    author = jdata['author']
+#    return (subreddit, [author])
 def get_data(comment_data):
     jdata = json.loads(comment_data)
     subreddit = jdata['subreddit']
     author = jdata['author']
-    return (subreddit, [author])
+    return (author, [subreddit])
 
 
 # Mapper for cleaning up all the data within the comment data.
@@ -51,7 +56,7 @@ def mapper(iterator):
 
 # Filters out the unnecessary data.
 def filterer(iterator):
-    return filter(lambda x: x[0] in SUBREDDITS and '[deleted]' not in x[1], iterator)
+    return filter(lambda x: x[1][0] in SUBREDDITS and x[0] != '[deleted]', iterator)
 
 
 
@@ -61,5 +66,5 @@ DB_NAME = 'CIS490'                           # Name of the database that will be
 PATH = 'file:///home/cata85/CIS490/Project/' # Path of the current working directory.
 COMMENT_FILE = 'Data/comments.txt'           # Name of the file containing raw comment data.
 SUBREDDIT_FILE = 'Data/subreddits.txt'       # Name of thee file containing top 100 subreddits.
-COLLECTION = 'subreddits'                    # Name of the collection that will hold all the subreddit data.
+COLLECTION = 'authors'                       # Name of the collection that will hold all the subreddit data.
 SUBREDDITS = get_subreddits(SUBREDDIT_FILE)

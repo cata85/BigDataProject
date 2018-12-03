@@ -15,41 +15,26 @@ def get_collection(db, COLLECTION):
     return collection
 
 
-# Updates the subreddits collection.
-def update_collection(DB_NAME, COLLECTION, comments_rdd):
+# Creates collections for subreddits.
+def create_collections(DB_NAME, rdd):
     def insert(iterator):
         client = MongoClient()
         db = client[DB_NAME]
-        collection = db[COLLECTION]
         for data in iterator:
-            dirty_json = json.loads(data)
-            author = dirty_json['author']
-            subreddit = dirty_json['subreddit']
-            collection.update(
-                    {'subreddit': subreddit},
-                    {'$addToSet': {'authors': author} },
-                    upsert=True)
-
-    comments_rdd.foreachPartition(insert)
-    print('Updated subreddits collection')
-    pass
-
-
-# Creates a collection for subreddits.
-def create_collection(DB_NAME, COLLECTION, rdd):
-    def insert(iterator):
-        client = MongoClient()
-        db = client[DB_NAME]
-        collection = db[COLLECTION]
-        for data in iterator:
-            subreddit = data[0]
-            authors = data[1]
-            total = len(authors)
-            print(total)
-            row = {'subreddit': subreddit, 'total': total, 'authors': authors}
+            author = data[0]
+            subreddits = data[1]
+            total = len(subreddits)
+            collection = db[subreddit]
+            if count % 5000 == 0:
+                print(COUNT)
+            COUNT += 1
+            row = {'author': author, 'subreddits': subreddits}
             collection.insert_one(row)
 
     rdd.foreachPartition(insert)
-    print('Created subreddits collection!')
+    print('Created authors collection!')
     pass
+
+
+COUNT = 0
 
