@@ -19,7 +19,7 @@ CREATE_IMAGES = True
 # GLOBALS
 DB_NAME = 'CIS490'                           # Name of the database that will be used.
 PATH = 'file:///home/cata85/CIS490/Project/' # Path of the current working directory.
-IMAGE_PATH = 'images'                        # Path of the image directory.
+IMAGE_PATH = 'website/static/images'         # Path of the image directory.
 COMMENT_FILE = 'Data/comments.txt'           # Name of the file containing raw comment data.
 SUBREDDIT_FILE = 'Data/subreddits.txt'       # Name of the file containing top 100 subreddits.
 DATA_FILE = 'Data/data.json'                 # Name of the file containing data for D3.

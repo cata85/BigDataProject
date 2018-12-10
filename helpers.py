@@ -7,6 +7,7 @@ import praw
 import pymongo
 from pymongo import MongoClient
 from pyspark import SparkContext
+from PIL import Image, ImageDraw, ImageFont
 import requests
 
 
@@ -55,5 +56,14 @@ def get_subreddit_images(reddit, SUBREDDITS, IMAGE_PATH):
         if url:
             with open(f'{IMAGE_PATH}/{sub}.png', 'wb') as f:
                 f.write(requests.get(url).content)
+        else:
+            W, H = (256, 256)
+            msg = str(sub)
+            img = Image.new('RGBA', (W, H), '#e0e1e2')
+            draw = ImageDraw.Draw(img)
+            my_font = ImageFont.truetype('/home/cata85/ms-fonts/Arial.TTF', 40)
+            w, h = my_font.getsize(msg)
+            draw.text(((W-w)/2, (H-h)/2), msg, fill='black', font=my_font)
+            img.save(IMAGE_PATH + '/' + str(sub) + '.png')
     pass
 

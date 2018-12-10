@@ -1,16 +1,14 @@
-import praw
-import requests
+from PIL import Image, ImageDraw, ImageFont
 
 
-reddit = praw.Reddit(
-    client_id = 'Ff85HPhi6wky5Q',
-    client_secret='WQkqCePEiMDybqTzJp-rY2mTLCs',
-    user_agent='testscript by /u/cata85'
-)
-sub = 'pics'
-image_path = 'images'
-subreddit = reddit.subreddit(sub)
-url = subreddit.icon_img
-with open(f'{image_path}/{sub}.png', 'wb') as f:
-    f.write(requests.get(url).content)
+W, H = (256, 256)
+msg = 'Test Text'
+
+img = Image.new('RGBA', (W,H), '#e0e1e2')
+draw = ImageDraw.Draw(img)
+my_font = ImageFont.truetype('/home/cata85/ms-fonts/Arial.TTF', 40)
+w, h = my_font.getsize(msg)
+draw.text(((W-w)/2, (H-h)/2), msg, fill='black', font=my_font)
+
+img.save('test.png')
 
