@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Subreddit Relationships</title>
+        <link rel="stylesheet" type="text/css" href="/static/main.css">
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    </head>
+    
+    <body>
+        <div id="canvas"></div>
+        {% if images %}
+        <meta id="images" data-images="{{ images }}">
+        <script type="text/javascript" src="/static/create.js"></script>
+        <script>
+            var images = $('#images').data('images');
+            var numNodes = images.length;
+            var radius = 400;
+            draw(images, numNodes, radius);
+        </script>
+        {% endif %}
+
+        <script>
+            var width = 1150;
+            var height = 1150;
+
+            function fx(d) { return d.x; };
+            function fy(d) { return d.y; };
+
+            // var rollup = d3.rollup()
+            //     .x(function(d) { return fx(d); })
+            //     .y(function(d) { return fy(d); });
+
+            // d3.xml("circle.svg", function(xml) {
+            //     svgdom = document.body.appendChild(xml.documentElement);
+            // });
+
+            // var i=0;
+            // for (i=0;i<=79;i++)
+            // {
+            //     document.write("<img src=images/"" + )
+            // }
+        </script>
+    </body>
+</html>
