@@ -1,22 +1,10 @@
-import pymongo
-from pymongo import MongoClient
+import praw
 
 
-client = MongoClient()
-db = client['CIS490']
-connection = db['subreddits']
-subreddits = connection.find()
+reddit = praw.Reddit(
+    client_id = 'Ff85HPhi6wky5Q',
+    client_secret='WQkqCePEiMDybqTzJp-rY2mTLCs',
+    user_agent='testscript by /u/cata85'
+)
 
-for sub in subreddits:
-    count = 0
-    print('===================================================')
-    print(sub['subreddit'])
-    for key in sorted(sub['data'], key=sub['data'].get, reverse=True):
-        if count == 5:
-            break
-        count += 1
-        print(key + ': ' + str(sub['data'][key] / sub['total']))
-    print('===================================================')
-
-client.close()
-
+print(reddit.read_only)

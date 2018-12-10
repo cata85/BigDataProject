@@ -33,12 +33,14 @@ def main():
                 helpers.SUBREDDITS
                 )
 
-    # Converts the subreddit data to a json data for usage.
-    data.create_json(
-            helpers.DB_NAME, 
-            helpers.SUBREDDIT_COLLECTION, 
-            helpers.DATA_FILE
-            )
+        # Converts the subreddit data to a json data for usage.
+        data.create_json(
+                helpers.DB_NAME, 
+                helpers.SUBREDDIT_COLLECTION, 
+                helpers.DATA_FILE
+                )
+    
+    # Download subreddit icon images from reddit using reddit's API.
 
     client.close()
     return True
