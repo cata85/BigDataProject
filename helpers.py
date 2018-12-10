@@ -5,13 +5,20 @@ import pymongo
 from pymongo import MongoClient
 from pyspark import SparkContext
 import json
+import praw
+import requests
 
 
 # Initializes the Mongodb client and Spark context.
 def initialize():
     client = MongoClient()
     sc = SparkContext('local', 'Project')
-    return client, sc
+    reddit = praw.Reddit(
+            client_id = 'Ff85HPhi6wky5Q',
+            client_secret='WQkqCePEiMDybqTzJp-rY2mTLCs',
+            user_agent='/u/cata85'
+            )
+    return client, sc, reddit
 
 # Checks if a database exists.
 def database_exists(client, DB_NAME):
@@ -32,7 +39,7 @@ def get_subreddits(FILE):
     subreddits = []
     with open(FILE) as f:
         for line in f:
-            subreddits.append(line[0:len(line)-1])
+            subreddits.append(line.rstrip())
     return subreddits
 
 
@@ -54,11 +61,20 @@ def filterer(iterator):
     return filter(lambda x: x[1][0] in SUBREDDITS and x[0] != '[deleted]', iterator)
 
 
+# Downloads subreddit icon images.
+def get_subreddit_images(reddit):
+    for subreddit in SUBREDDITS:
+        sub = reddit.subreddit(subreddit)
+        url = sub.icon_img
+        with open(f'{IMAGE_PATH}/{sub}.png', 'wb') as f:
+            f.write(requests.get(url).content)
+    pass
 
 
 # GLOBALS
 DB_NAME = 'CIS490'                           # Name of the database that will be used.
 PATH = 'file:///home/cata85/CIS490/Project/' # Path of the current working directory.
+IMAGE_PATH = 'images'                       # Path of the image directory.
 COMMENT_FILE = 'Data/comments.txt'           # Name of the file containing raw comment data.
 SUBREDDIT_FILE = 'Data/subreddits.txt'       # Name of the file containing top 100 subreddits.
 DATA_FILE = 'Data/data.json'                 # Name of the file containing data for D3.

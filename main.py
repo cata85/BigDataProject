@@ -3,7 +3,7 @@ import helpers
 
 
 def main():
-    client, sc = helpers.initialize()
+    client, sc, reddit = helpers.initialize()
     
     if not helpers.database_exists(client, helpers.DB_NAME):
         # Uses RDD's to parallize initial data processing.
@@ -40,7 +40,8 @@ def main():
                 helpers.DATA_FILE
                 )
     
-    # Download subreddit icon images from reddit using reddit's API.
+        # Download subreddit icon images from reddit using reddit's API.
+        helpers.get_subreddit_images(reddit)
 
     client.close()
     return True
