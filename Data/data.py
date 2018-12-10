@@ -55,3 +55,29 @@ def create_subreddits(DB_NAME, AUTHOR_COLLECTION, SUBREDDIT_COLLECTION, SUBREDDI
     client.close()
     pass
 
+
+# Creates json file to store all data to be used by D3.
+def create_json(DB_NAME, SUBREDDIT_COLLECTION, FILENAME):
+    client = MongoClient()
+    db = client[DB_NAME]
+    subreddit_collection = db[SUBREDDIT_COLLECTION]
+    data = []
+    subreddits = subreddit_collection.find({})
+    for sub in subreddits:
+        parent_subreddit = sub['subreddit']
+        subreddit_data = {'subreddit': parent_subreddit, 'data': {}}
+        for key in sorted(sub['data'], key=sub['data'].get, reverse=True):
+            child_subreddit = key
+            child_total = sub['data'][key]
+            subreddit_total = sub['total']
+            value = child_total / subreddit_total
+            if value < 0.05:
+                break
+            else:
+                subreddit_data['data'][child_subreddit] = value
+        data.append(subreddit_data)
+    client.close()
+    with open(FILENAME, 'w') as json_file:
+        json.dump(data, json_file)
+    pass
+

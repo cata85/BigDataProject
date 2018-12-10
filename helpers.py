@@ -60,7 +60,8 @@ def filterer(iterator):
 DB_NAME = 'CIS490'                           # Name of the database that will be used.
 PATH = 'file:///home/cata85/CIS490/Project/' # Path of the current working directory.
 COMMENT_FILE = 'Data/comments.txt'           # Name of the file containing raw comment data.
-SUBREDDIT_FILE = 'Data/subreddits.txt'       # Name of thee file containing top 100 subreddits.
+SUBREDDIT_FILE = 'Data/subreddits.txt'       # Name of the file containing top 100 subreddits.
+DATA_FILE = 'Data/data.json'                 # Name of the file containing data for D3.
 AUTHOR_COLLECTION = 'authors'                # Name of the collection that will hold all the authors.
 SUBREDDIT_COLLECTION = 'subreddits'          # Name of the collection that will hold all the subreddits.
 SUBREDDITS = get_subreddits(SUBREDDIT_FILE)  # List that holds the top 100 subreddits.
