@@ -1,4 +1,21 @@
 var createNodes = function (images, numNodes, radius) {
+    function httpGet(theUrl) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+        xmlHttp.send( null );
+        return JSON.parse(xmlHttp.responseText);
+    }
+
+    function getData(name) {
+        for (var i=0; i<data.length; i++) {
+            if (name == data[i].subreddit) {
+                return data[i].data;
+            }
+        }
+    }
+
+    var url = 'http://localhost:5000/data/';
+    var data = httpGet(url);
     var nodes = [],
         width = (radius * 2) + 50,
         height = (radius * 2) + 50,
@@ -12,10 +29,11 @@ var createNodes = function (images, numNodes, radius) {
         y = (radius * Math.sin(angle)) + (width/2);
         dirt_name = images[i].replace('.png', '');
         name = dirt_name.replace('static/images/', '');
+        var _data = getData(name);
         nodes.push({
-            'id': 'c' + i, 
-            'name': name,
+            'id': name,
             'image': images[i], 
+            'data': _data,
             'x': x, 
             'y': y
         });
@@ -30,18 +48,6 @@ var createSvg = function (radius, callback) {
                  .attr('height', (radius * 2) + 50);
     callback(svg);
 }
-
-// function readTextFile(file, callback) {
-//     var rawFile = new XMLHttpRequest();
-//     rawFile.overrideMimeType("application/json");
-//     rawFile.open("GET", file, true);
-//     rawFile.onreadystatechange = function() {
-//         if (rawFile.readyState === 4 && rawFile.status == "200") {
-//             callback(rawFile.responseText);
-//         }
-//     }
-//     rawFile.send(null);
-// }
 
 var createElements = function (svg, nodes, elementRadius) {
     'use strict';
@@ -60,6 +66,7 @@ var createElements = function (svg, nodes, elementRadius) {
           });
       };
 
+
     var node = svg.selectAll('g.node')
                     .data(nodes, function (d) { return d.id; 
                     });
@@ -67,14 +74,13 @@ var createElements = function (svg, nodes, elementRadius) {
     var nodeEnter = node.enter().append('svg:g')
                     .attr('class', 'node')
                     .attr('id', function (d) { return d.id; })
-                    .attr('name', function (d) { return d.name; })
                     .attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
         
     var setEvents1 = nodeEnter
                     .on('mouseenter', function () {
                         d3.select( this ).moveToFront();
-                        var name = this.getAttribute('name');
-                        document.getElementById('name').textContent = name;
+                        var id = this.getAttribute('id');
+                        document.getElementById('name').textContent = id;
                     })
                     .on('mouseleave', function() {
                         d3.select( this ).moveToBack();
@@ -83,27 +89,54 @@ var createElements = function (svg, nodes, elementRadius) {
 
     nodeEnter.append('svg:circle')
                     .attr('r', function (d) { return elementRadius / 2; })
-                    .attr('name', function (d) { return d.name; })
                     .style('fill', '#eee');
 
-    svg.selectAll('g.node')
-                    .append('path')
-                    .attr('d', function (d) { 
-                        var sx = d.source.x, sy = d.source.y,
-                        tx = d.target.x, ty = d.target.y,
-                        dx = tx - sx, dy = ty - sy,
-                        dr = 2 * Math.sqrt(dx * dx + dy * dy);
-                        return "M" + sx + "," + sy + "A" + dr + "," + dr + " 0 0,1 " + tx + "," + ty;
-                    });
+    function getNode(nodes, id) {
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].id == id) {
+                return nodes[i];
+            }
+        }
+    }
 
-    // readTextFile("static/data.json", function(text){
-    //     var data = JSON.parse(text);
-    //     console.log(data);
+    // nodeEnter.each(function (element) {
+    //     element.append('svg:path')
+    //         .attr('d', function (d) {
+    //             var _data = d.data;
+    //             console.log(_data);
+    //             // var target = getNode(nodes, key)
+    //             // var sx = _node.x, sy = _node.y,
+    //             // tx = target.x, ty = target.y,
+    //             // dx = tx - sx, dy = ty - sy,
+    //             // dr = 2 * Math.sqrt(dx * dx + dy * dy);
+    //             // return "M " + sx + " " + sy + " L " + tx + " " + ty;
+    //         })
+    //         .style('stroke', 'grey')
+    //         .style('stroke-width', 1);
     // });
+    
+    for (var i=0; i<nodes.length; i++) {
+        var _node = nodes[i];
+        var id = '#' + _node.id;
+        var _data = _node.data;
+        for (var key in _data) {
+            svg.select(id).enter()
+                .append('svg:path')
+                .attr('d', function (d) {
+                    var target = getNode(nodes, key)
+                    var sx = _node.x, sy = _node.y,
+                    tx = target.x, ty = target.y,
+                    dx = tx - sx, dy = ty - sy,
+                    dr = 2 * Math.sqrt(dx * dx + dy * dy);
+                    return "M " + sx + " " + sy + " L " + tx + " " + ty;
+                })
+                .style('stroke', 'grey')
+                .style('stroke-width', 1);
+        }
+    }
 
     var images = nodeEnter.append('svg:image')
                     .attr('xlink:href', function (d) { return d.image; })
-                    // .attr('id', function (d) { return d.id; })
                     .attr('x', function (d) { return -1 * ((elementRadius * 2) / 2); })
                     .attr('y', function (d) { return -1 * ((elementRadius * 2) / 2); })
                     .attr('height', elementRadius * 2)
