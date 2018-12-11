@@ -79,12 +79,9 @@ var createElements = function (svg, nodes, elementRadius) {
     var setEvents1 = nodeEnter
                     .on('mouseenter', function () {
                         d3.select( this ).moveToFront();
-                        var id = this.getAttribute('id');
-                        document.getElementById('name').textContent = id;
                     })
                     .on('mouseleave', function() {
                         d3.select( this ).moveToBack();
-                        document.getElementById('name').textContent = '';
                     });
 
     nodeEnter.append('svg:circle')
@@ -99,39 +96,29 @@ var createElements = function (svg, nodes, elementRadius) {
         }
     }
 
-    // nodeEnter.each(function (element) {
-    //     element.append('svg:path')
-    //         .attr('d', function (d) {
-    //             var _data = d.data;
-    //             console.log(_data);
-    //             // var target = getNode(nodes, key)
-    //             // var sx = _node.x, sy = _node.y,
-    //             // tx = target.x, ty = target.y,
-    //             // dx = tx - sx, dy = ty - sy,
-    //             // dr = 2 * Math.sqrt(dx * dx + dy * dy);
-    //             // return "M " + sx + " " + sy + " L " + tx + " " + ty;
-    //         })
-    //         .style('stroke', 'grey')
-    //         .style('stroke-width', 1);
-    // });
-    
     for (var i=0; i<nodes.length; i++) {
         var _node = nodes[i];
         var id = '#' + _node.id;
         var _data = _node.data;
         for (var key in _data) {
-            svg.select(id).enter()
+            var value = _data[key];
+            value = value * 70.0;
+            svg.select(id)
                 .append('svg:path')
+                .attr('class', 'paths')
+                .attr('transform', function (d) { return 'translate(' + -1*d.x + ',' + -1*d.y + ')'; })
                 .attr('d', function (d) {
                     var target = getNode(nodes, key)
                     var sx = _node.x, sy = _node.y,
                     tx = target.x, ty = target.y,
                     dx = tx - sx, dy = ty - sy,
-                    dr = 2 * Math.sqrt(dx * dx + dy * dy);
+                    dr = 30 * Math.sqrt(dx * dx + dy * dy);
+                    // return "M" + sx + "," + sy + "A" + dr + "," + dr + " 0 0,1 " + tx + "," + ty;
                     return "M " + sx + " " + sy + " L " + tx + " " + ty;
                 })
-                .style('stroke', 'grey')
-                .style('stroke-width', 1);
+                .attr('stroke', 'grey')
+                .attr('stroke-opacity', 0.1)
+                .attr('stroke-width', 5);
         }
     }
 
@@ -140,10 +127,20 @@ var createElements = function (svg, nodes, elementRadius) {
                     .attr('x', function (d) { return -1 * ((elementRadius * 2) / 2); })
                     .attr('y', function (d) { return -1 * ((elementRadius * 2) / 2); })
                     .attr('height', elementRadius * 2)
-                    .attr('width', elementRadius * 2);
+                    .attr('width', elementRadius * 2)
+                    .attr('name', function (d) { return d.id; });
 
     var setEvents2 = images
                     .on('mouseenter', function () {
+                        var name = this.getAttribute('name');
+                        document.getElementById('name').textContent = name;
+                        var id = '#' + name;
+                        d3.select( id )
+                          .selectAll ( '.paths' )
+                          .transition()
+                          .attr('stroke', 'blue')
+                          .attr('stroke-opacity', 0.7)
+                          .attr('stroke-width', 8);
                         d3.select( this )
                           .transition()
                           .attr('x', function (d) { return -1 * ((elementRadius * 8) / 2); })
@@ -152,6 +149,15 @@ var createElements = function (svg, nodes, elementRadius) {
                           .attr('width', elementRadius * 8);
                     })
                     .on('mouseleave', function () {
+                        var name = this.getAttribute('name');
+                        document.getElementById('name').textContent = '';
+                        var id = '#' + name;
+                        d3.select( id )
+                          .selectAll( '.paths' )
+                          .transition()
+                          .attr('stroke', 'grey')
+                          .attr('stroke-opacity', 0.1)
+                          .attr('stroke-width', 5);
                         d3.select( this )
                           .transition()
                           .attr('x', function (d) { return -1 * ((elementRadius * 2) / 2); })
