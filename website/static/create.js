@@ -113,7 +113,6 @@ var createElements = function (svg, nodes, elementRadius) {
                     tx = target.x, ty = target.y,
                     dx = tx - sx, dy = ty - sy,
                     dr = 30 * Math.sqrt(dx * dx + dy * dy);
-                    // return "M" + sx + "," + sy + "A" + dr + "," + dr + " 0 0,1 " + tx + "," + ty;
                     return "M " + sx + " " + sy + " L " + tx + " " + ty;
                 })
                 .attr('stroke', 'grey')
